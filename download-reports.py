@@ -43,13 +43,6 @@ def get_report_number_from_link(link):
   report_number = int(re.findall(r'\d+', filename)[0])
   return report_number
 
-def get_province_index(provinces, name):
-  for index, province in enumerate(provinces):
-    if province['name'] == name:
-      return index
-
-  return -1
-
 
 headers = {
   'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',

@@ -77,8 +77,11 @@ for file_name in file_list:
   
   date = get_date(file_reader.getPage(1).extractText(), report_number)
 
-  ## so here i go covering case by case because they neither provide an IP
+  ## so here i go covering case by case because they neither provide an API
   ## nor they have consistency writing documents...
+
+  if report_number < 13:
+    continue
 
   print("Processing %d ..." % report_number)
 
@@ -194,6 +197,209 @@ for file_name in file_list:
       })
 
   if report_number == 11:
+    result = read_pdf(file_path, pages = 2, area = (231.413,51.638,688.118,362.228), output_format="json")
+    
+    data = result[0]['data']
+
+    for row in data:
+      province = ' '.join(row[0]['text'].split(' ')[1:]).strip()
+
+      if province in ['Total', 'Provincia', '']:
+        continue
+      
+      cases = int(row[1]['text'].split(' ')[-1].strip())
+      deaths = int(row[2]['text'].strip())
+
+      index = get_province_index(province)
+
+      if index == -1:
+        sys.exit("could not find index for %s (%d)" % (province, report_number))
+
+      provinces[index]['cases'].append({
+        'source_report': report_number,
+        'date': date,
+        'total_cases': cases,
+        'total_deaths': deaths,
+        'total_recovered': 0,
+        'total_tests': None,
+        'positivity': None,
+      })
+
+  if report_number == 12:
+    result = read_pdf(file_path, pages = 2, area = (229.883,53.168,690.413,356.873), output_format="json", stream=True)
+    
+    data = result[0]['data']
+
+    for row in data:
+      province = ' '.join(row[0]['text'].split(' ')[1:]).strip()
+
+      if province in ['Total', 'Provincia', '']:
+        continue
+      
+      cases = int(row[1]['text'].split(' ')[-1])
+      deaths = int(row[2]['text'].split(' ')[-1])
+
+      index = get_province_index(province)
+
+      if index == -1:
+        sys.exit("could not find index for %s (%d)" % (province, report_number))
+
+      provinces[index]['cases'].append({
+        'source_report': report_number,
+        'date': date,
+        'total_cases': cases,
+        'total_deaths': deaths,
+        'total_recovered': 0,
+        'total_tests': None,
+        'positivity': None,
+      })
+
+  if report_number == 13:
+    result = read_pdf(file_path, pages = 2, area = (220.703,37.868,690.413,330.098), output_format="json", stream=True)
+    
+    data = result[0]['data']
+
+    for row in data:
+      province = ' '.join(row[0]['text'].split(' ')[1:]).strip()
+
+      if province in ['Total', 'Provincia', '']:
+        continue
+      
+      cases = int(row[1]['text'].split(' ')[-1])
+      deaths = int(row[2]['text'].split(' ')[-1])
+
+      index = get_province_index(province)
+
+      if index == -1:
+        sys.exit("could not find index for %s (%d)" % (province, report_number))
+      
+      provinces[index]['cases'].append({
+        'source_report': report_number,
+        'date': date,
+        'total_cases': cases,
+        'total_deaths': deaths,
+        'total_recovered': 0,
+        'total_tests': None,
+        'positivity': None,
+      })
+
+  if report_number == 14:
+    result = read_pdf(file_path, pages = 2, area = (226.823,52.403,688.883,309.443), output_format="json", stream=True)
+    
+    data = result[0]['data']
+
+    for row in data:
+      province = ' '.join(row[0]['text'].split(' ')[1:]).strip()
+
+      if province in ['Total', 'Provincia', '']:
+        continue
+      
+      cases = int(row[1]['text'].split(' ')[-1])
+      deaths = int(row[2]['text'].split(' ')[-1])
+
+      index = get_province_index(province)
+
+      if index == -1:
+        sys.exit("could not find index for %s (%d)" % (province, report_number))
+      
+      provinces[index]['cases'].append({
+        'source_report': report_number,
+        'date': date,
+        'total_cases': cases,
+        'total_deaths': deaths,
+        'total_recovered': 0,
+        'total_tests': None,
+        'positivity': None,
+      })
+
+  if report_number == 15:
+    result = read_pdf(file_path, pages = 2, area = (232.943,53.168,685.823,312.503), output_format="json", stream=True)
+    
+    data = result[0]['data']
+
+    for row in data:
+      province = ' '.join(row[0]['text'].split(' ')[1:]).strip()
+
+      if province in ['Total', 'Provincia', '']:
+        continue
+      
+      cases = int(row[1]['text'].split(' ')[-1])
+      deaths = int(row[2]['text'].split(' ')[-1])
+
+      index = get_province_index(province)
+
+      if index == -1:
+        sys.exit("could not find index for %s (%d)" % (province, report_number))
+      
+      provinces[index]['cases'].append({
+        'source_report': report_number,
+        'date': date,
+        'total_cases': cases,
+        'total_deaths': deaths,
+        'total_recovered': 0,
+        'total_tests': None,
+        'positivity': None,
+      })
+
+  if report_number == 16:
+    result = read_pdf(file_path, pages = 2, area = (231.413,52.403,694.238,320.918), output_format="json", stream=True)
+    
+    data = result[0]['data']
+
+    for row in data:
+      province = ' '.join(row[0]['text'].split(' ')[1:]).strip()
+
+      if province in ['Total', 'Provincia', '']:
+        continue
+      
+      cases = int(row[1]['text'].split(' ')[-1])
+      deaths = int(row[2]['text'].split(' ')[-1])
+
+      index = get_province_index(province)
+
+      if index == -1:
+        sys.exit("could not find index for %s (%d)" % (province, report_number))
+      
+      provinces[index]['cases'].append({
+        'source_report': report_number,
+        'date': date,
+        'total_cases': cases,
+        'total_deaths': deaths,
+        'total_recovered': 0,
+        'total_tests': None,
+        'positivity': None,
+      })
+
+  if report_number == 17:
+    result = read_pdf(file_path, pages = 2, area = (232.943,53.933,695.003,313.268), output_format="json", stream=True)
+    
+    data = result[0]['data']
+
+    for row in data:
+      province = ' '.join(row[0]['text'].split(' ')[1:]).strip()
+
+      if province in ['Total', 'Provincia', '']:
+        continue
+      
+      cases = int(row[2]['text'].split(' ')[-1])
+      deaths = int(row[4]['text'].split(' ')[-1])
+
+      index = get_province_index(province)
+
+      if index == -1:
+        sys.exit("could not find index for %s (%d)" % (province, report_number))
+      
+      provinces[index]['cases'].append({
+        'source_report': report_number,
+        'date': date,
+        'total_cases': cases,
+        'total_deaths': deaths,
+        'total_recovered': 0,
+        'total_tests': None,
+        'positivity': None,
+      })
+
+  if report_number == 18:
     break
 
-# print(provinces)
+print(provinces)

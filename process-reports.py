@@ -6,6 +6,7 @@ from tabula.io import read_pdf
 import PyPDF2
 import json
 import sys
+import re
 
 provinces = [
   { "name": "Distrito Nacional", "population": 0, "cases": [] },
@@ -60,12 +61,17 @@ def get_province_index(name):
 
   return -1
 
-def get_date(page_text, number):
+def get_date(page_text, report_number):
   lines = page_text.split("\n")
-  for line in lines:
-    if line.startswith('FECHA'):
-      [dd, mm, yyyy] = line.replace('FECHA: ', '').split('/')
-      return '%s/%s/%s' % (yyyy, mm, dd)
+  if report_number < 69:
+    for line in lines:
+      if line.startswith('FECHA'):
+        [dd, mm, yyyy] = line.replace('FECHA: ', '').split('/')
+        return '%s/%s/%s' % (yyyy, mm, dd)
+  else:
+    result = page_text.replace("\n", '').strip()[-10:]
+    [dd, mm, yyyy] = result.replace('FECHA: ', '').split('/')
+    return '%s/%s/%s' % (yyyy, mm, dd)
 
 base = os.path.dirname(os.path.abspath(__file__)) + '/reports/'
 file_list = sorted(os.listdir(base), key = lambda x: int(x.split('.')[0]))
@@ -426,7 +432,7 @@ for file_name in file_list:
         'total_tests': None,
       })
 
-  if report_number > 18 and 55 > report_number:
+  if report_number > 18 and 61 > report_number:
     result = read_pdf(file_path, pages = 2, output_format="json", stream=True)
 
     # Yes, out of this big chunk, 37 is yet another exception...
@@ -449,8 +455,18 @@ for file_name in file_list:
 
       index = get_province_index(province)
 
-      if index == -1:
-        sys.exit("could not find index for %s (%d)" % (province, report_number))
+      if index == -1: # for this case, trusting they didn't have any typos.
+        continue
+
+      print({
+        'source_report': report_number,
+        'date': date,
+        'total_cases': cases,
+        'total_deaths': deaths,
+        'positivity': positivity,
+        'total_recovered': recovered,
+        'total_tests': None,
+      })
 
       provinces[index]['cases'].append({
         'source_report': report_number,

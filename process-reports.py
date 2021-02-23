@@ -74,14 +74,11 @@ for file_name in file_list:
   file_path = base + file_name
   report_number = int(file_name.split('.')[0])
   file_reader = PyPDF2.PdfFileReader(file_path)
-  
+
   date = get_date(file_reader.getPage(1).extractText(), report_number)
 
   ## so here i go covering case by case because they neither provide an API
   ## nor they have consistency writing documents...
-
-  if report_number < 13:
-    continue
 
   print("Processing %d ..." % report_number)
 
@@ -400,6 +397,69 @@ for file_name in file_list:
       })
 
   if report_number == 18:
-    break
+    result = read_pdf(file_path, pages = 2, output_format="json", stream=True)
 
-print(provinces)
+    data = result[0]['data'][3:-2]
+
+    for row in data:
+      province = ' '.join(row[0]['text'].split(' ')[1:-1]).strip()
+
+      if province in ['Total', 'Provincia', '']:
+        continue
+      
+      cases = int(row[2]['text'].split(' ')[0])
+      positivity = int(row[3]['text'].replace('%', '')) / 100
+      deaths = int(row[4]['text'].split(' ')[-1])
+
+      index = get_province_index(province)
+
+      if index == -1:
+        sys.exit("could not find index for %s (%d)" % (province, report_number))
+      
+      provinces[index]['cases'].append({
+        'source_report': report_number,
+        'date': date,
+        'total_cases': cases,
+        'total_deaths': deaths,
+        'positivity': positivity,
+        'total_recovered': 0,
+        'total_tests': None,
+      })
+
+  if report_number > 18 and 55 > report_number:
+    result = read_pdf(file_path, pages = 2, output_format="json", stream=True)
+
+    # Yes, out of this big chunk, 37 is yet another exception...
+
+    data = result[1 if report_number == 37 else 0]['data'][4:-1]
+
+    for row in data:
+      if row[1]['text'].strip() == '':
+        province = ' '.join(row[0]['text'].split(' ')[1:-1])
+      else:
+        province = ' '.join(row[0]['text'].split(' ')[1:])
+
+      if province in ['Total', 'Provincia', '']:
+        continue
+      
+      cases = int(row[2]['text'].split(' ')[0])
+      positivity = float(row[4]['text'].replace('%', '')) / 100
+      recovered = int(row[5]['text'])
+      deaths = int(row[6]['text'].split(' ')[-1])
+
+      index = get_province_index(province)
+
+      if index == -1:
+        sys.exit("could not find index for %s (%d)" % (province, report_number))
+
+      provinces[index]['cases'].append({
+        'source_report': report_number,
+        'date': date,
+        'total_cases': cases,
+        'total_deaths': deaths,
+        'positivity': positivity,
+        'total_recovered': recovered,
+        'total_tests': None,
+      })
+
+#print(provinces)

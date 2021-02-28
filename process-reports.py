@@ -86,7 +86,7 @@ for file_name in file_list:
   ## so here i go covering case by case because they neither provide an API
   ## nor they have consistency writing documents...
 
-  if report_number < 60:
+  if report_number < 63:
     continue
 
   print("Processing %d ..." % report_number)
@@ -461,16 +461,6 @@ for file_name in file_list:
       if index == -1: # for this case, trusting they didn't have any typos.
         continue
 
-      print({
-        'source_report': report_number,
-        'date': date,
-        'total_cases': cases,
-        'total_deaths': deaths,
-        'positivity': positivity,
-        'total_recovered': recovered,
-        'total_tests': None,
-      })
-
       provinces[index]['cases'].append({
         'source_report': report_number,
         'date': date,
@@ -515,8 +505,112 @@ for file_name in file_list:
         'total_tests': None,
       })
 
+  if report_number == 64:
+    result = read_pdf(file_path, pages = 2, output_format="json", stream=True)
 
-  if report_number > 65:
+    data = result[0]['data'][5:-2]
+
+    for row in data:
+      if row[1]['text'].strip() == '':
+        province = ' '.join(row[0]['text'].split(' ')[1:-1])
+      else:
+        province = ' '.join(row[0]['text'].split(' ')[1:])
+
+      if province in ['Total', 'Provincia', '']:
+        continue
+
+      tests = int(row[1]['text'].replace(',', ''))
+      cases = int(row[4]['text'].replace(',', ''))
+      positivity = float(row[6]['text'].split(' ')[-1]) / 100
+      recovered = int(row[7]['text'].replace(',', ''))
+      deaths = int(row[10]['text'])
+
+      index = get_province_index(province)
+
+      if index == -1: # for this case, trusting they didn't have any typos.
+        continue
+      
+      provinces[index]['cases'].append({
+        'source_report': report_number,
+        'date': date,
+        'total_cases': cases,
+        'total_deaths': deaths,
+        'positivity': positivity,
+        'total_recovered': recovered,
+        'total_tests': tests,
+      })
+
+  if report_number == 65:
+    result = read_pdf(file_path, pages = 2, output_format="json", stream=True)
+
+    data = result[0]['data'][5:-2]
+
+    for row in data:
+      if row[1]['text'].strip() == '':
+        province = ' '.join(row[0]['text'].split(' ')[1:-1])
+      else:
+        province = ' '.join(row[0]['text'].split(' ')[1:])
+
+      if province in ['Total', 'Provincia', '']:
+        continue
+
+      tests = int(row[1]['text'].replace(',', ''))
+      cases = int(row[3]['text'].replace(',', ''))
+      positivity = float(row[5]['text'].split(' ')[-1]) / 100
+      recovered = int(row[6]['text'].replace(',', ''))
+      deaths = int(row[7]['text'].split(' ')[1])
+
+      index = get_province_index(province)
+
+      if index == -1: # for this case, trusting they didn't have any typos.
+        continue
+
+      provinces[index]['cases'].append({
+        'source_report': report_number,
+        'date': date,
+        'total_cases': cases,
+        'total_deaths': deaths,
+        'positivity': positivity,
+        'total_recovered': recovered,
+        'total_tests': tests,
+      })
+
+  if report_number == 66:
+    result = read_pdf(file_path, pages = 2, output_format="json", stream=True)
+
+    data = result[0]['data'][5:-2]
+
+    for row in data:
+      if row[1]['text'].strip() == '':
+        province = ' '.join(row[0]['text'].split(' ')[1:-1])
+      else:
+        province = ' '.join(row[0]['text'].split(' ')[1:])
+
+      if province in ['Total', 'Provincia', '']:
+        continue
+
+      tests = int(row[1]['text'].replace(',', ''))
+      cases = int(row[4]['text'].replace(',', ''))
+      positivity = float(row[6]['text']) / 100
+      recovered = int(row[7]['text'].replace(',', ''))
+      deaths = int(row[8]['text'].split(' ')[1])
+
+      index = get_province_index(province)
+
+      if index == -1: # for this case, trusting they didn't have any typos.
+        continue
+
+      provinces[index]['cases'].append({
+        'source_report': report_number,
+        'date': date,
+        'total_cases': cases,
+        'total_deaths': deaths,
+        'positivity': positivity,
+        'total_recovered': recovered,
+        'total_tests': tests,
+      })
+
+  if report_number > 70:
     break
 
 #print(provinces)

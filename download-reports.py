@@ -5,6 +5,7 @@ import requests
 from bs4 import BeautifulSoup
 import re
 import os
+import sys
 
 def fix_link(link):
   link = link.strip().strip('/').replace('Boletín', 'Boletin')
@@ -39,7 +40,7 @@ def fix_link(link):
   return link
 
 def get_report_number_from_link(link):
-  filename = link.split('/')[-1].replace('COVID-19', '')
+  filename = link.split('/')[-1].replace('COVID-19', '').replace('%20', '')
   report_number = int(re.findall(r'\d+', filename)[0])
   return report_number
 
@@ -56,13 +57,11 @@ soup = BeautifulSoup(response.content, 'html.parser')
 report_list = soup.select('[rel="noopener noreferrer"]')
 links = list(set(map(lambda a: 'https://www.msp.gob.do/' + fix_link(a['href']), report_list)))
 
-## these 2 are linked WRONG on the website or are just not listed at all in the HTML
+## these 4 are linked WRONG on the website or are just not listed at all in the HTML
 links.append("https://www.msp.gob.do/web/wp-content/uploads/2020/06/Boletin-especial-88.pdf")
 links.append("https://www.msp.gob.do/web/wp-content/uploads/2020/08/Boletin-especial-150-COVID-19.pdf")
-
-# 194 and 319 don't exist on the website (tried every naming convention)
-# but they do exist on Twitter https://twitter.com/search?q=from%3Asaludpublicard%20194%20OR%20319&src=typed_query&f=live
-# have to be copied manually :( 
+links.append("http://digepisalud.gob.do/docs/Vigilancia%20Epidemiologica/Alertas%20epidemiologicas/Coronavirus/Nacional/Boletin%20Especial%20COVID-19/Boletin%20especial%20319%20-%20COVID-19.pdf")
+links.append("http://digepisalud.gob.do/docs/Vigilancia%20Epidemiologica/Alertas%20epidemiologicas/Coronavirus/Nacional/Boletin%20Especial%20COVID-19/Boletines%20COVID-19%20DEL%202020/09%20-%20Septiembre/Boletin%20especial%20194%20-%20COVID-19.pdf")
 
 most_recent_one = 'https://www.msp.gob.do/' + fix_link(soup.select('iframe')[0]['data-src'])
 links.append(most_recent_one)

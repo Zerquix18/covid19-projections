@@ -86,6 +86,9 @@ for file_name in file_list:
   ## so here i go covering case by case because they neither provide an API
   ## nor they have consistency writing documents...
 
+  if report_number < 60:
+    continue
+
   print("Processing %d ..." % report_number)
 
   if report_number == 1:
@@ -432,7 +435,7 @@ for file_name in file_list:
         'total_tests': None,
       })
 
-  if report_number > 18 and 61 > report_number:
+  if (report_number > 18 and 61 > report_number) or (report_number > 61 and 64 > report_number):
     result = read_pdf(file_path, pages = 2, output_format="json", stream=True)
 
     # Yes, out of this big chunk, 37 is yet another exception...
@@ -477,5 +480,43 @@ for file_name in file_list:
         'total_recovered': recovered,
         'total_tests': None,
       })
+
+  if report_number == 61:
+    result = read_pdf(file_path, pages = 2, output_format="json", stream=True)
+
+    data = result[0]['data'][4:-1]
+
+    for row in data:
+      if row[1]['text'].strip() == '':
+        province = ' '.join(row[0]['text'].split(' ')[1:-1])
+      else:
+        province = ' '.join(row[0]['text'].split(' ')[1:])
+
+      if province in ['Total', 'Provincia', '']:
+        continue
+      
+      cases = int(row[2]['text'].split(' ')[0])
+      positivity = float(row[3]['text'].split(' ')[-1]) / 100
+      recovered = int(row[4]['text'])
+      deaths = int(row[5]['text'].split(' ')[-1])
+
+      index = get_province_index(province)
+
+      if index == -1: # for this case, trusting they didn't have any typos.
+        continue
+
+      provinces[index]['cases'].append({
+        'source_report': report_number,
+        'date': date,
+        'total_cases': cases,
+        'total_deaths': deaths,
+        'positivity': positivity,
+        'total_recovered': recovered,
+        'total_tests': None,
+      })
+
+
+  if report_number > 65:
+    break
 
 #print(provinces)
